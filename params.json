@@ -1,0 +1,6 @@
+{
+  "name": "Days Since Event",
+  "tagline": "A simple PHP page for counting the days since an event",
+  "body": "### Days Since an Event\r\n\r\nHow many days past since Rio 2016 Olympics opening ceremony?  daysSinceEvent/daysSinceEvent.php?event=Rio 2016 Olympics opening ceremony&date=2016-08-05\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
