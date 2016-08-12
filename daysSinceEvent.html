@@ -1,0 +1,37 @@
+<html>
+	<head>
+		<title>Days since event</title>
+	</head>
+	<body style="text-align:center">
+		<div id="numberOfDays" style="font-size:300pt"></div>
+		<div style="font-size:40pt; font-style:italic">days since <span id="eventDescription"></span></div>
+	</body>
+</html>
+
+<script>
+
+	document.getElementById("numberOfDays").innerHTML = getDaysSinceDate("eventDate");
+	document.getElementById("eventDescription").innerHTML = getQueryVariable("eventDescription");
+
+	function getDaysSinceDate(variable) {
+
+		var eventDateUrlParameter = getQueryVariable(variable);
+		var eventDateAsArray = eventDateUrlParameter.split('/');
+		var eventDateAsObject = new Date(eventDateAsArray[2], eventDateAsArray[0]-1, eventDateAsArray[1]);
+		var currentDateAsObject = new Date()
+		var numberOfDaysSinceEventDate = Math.round((currentDateAsObject-eventDateAsObject)/(1000*60*60*24));
+		return numberOfDaysSinceEventDate;
+	}
+
+	function getQueryVariable(variable) {
+		var query = window.location.search.substring(1);
+		var vars = query.split("&");
+		for (var i=0;i<vars.length;i++) {
+			var pair = vars[i].split("=");
+			if (pair[0] == variable) {
+				return unescape(pair[1]);
+			}
+		} 
+	}
+
+</script>
