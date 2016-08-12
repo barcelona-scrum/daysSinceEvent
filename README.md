@@ -1,2 +1,2 @@
 # daysSinceEvent
-A simple PHP file for counting the days since an event
+A simple HTML file for counting the days since an event
