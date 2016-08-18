@@ -1,80 +1,18 @@
+<!DOCTYPE html>
 <html>
 	<head>
+        <meta charset="utf8">
+        <link rel="stylesheet" type="text/css" href="daysSinceEvent.css">
 		<title>Days since event</title>
-        <style>
-#numberOfDays {
-    position: relative;
-    padding:0.2em;
-    margin-top: 50px;
-}
-#numberOfDays.warning:before {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    top: 0;
-    left: 0;
-    border: 300pt solid #fffe40;
-    border-top: 300pt solid transparent;
-    border-left: 300pt solid transparent;
-    transform: translate(-11%, 15%) scale(0.7, 1) rotate(-135deg);
-    width: 0;
-    height: 0;
-    padding: 0;
-    margin: 0;
-}
-#numberOfDays.alert {
-    border-radius: 100%;
-    background-color: #ff0000;
-}
-        </style>
 	</head>
-	<body style="text-align:center">
-		<div id="numberOfDays" style="font-size:300pt;display:inline-block;"></div>
-		<div style="font-size:40pt; font-style:italic;margin-top:1em;">days since <span id="eventDescription"></span></div>
-        <div class="triangle"></div>
+	<body>
+        <div class="number" id="numberOfDays">
+            ???
+        </div>
+		<div class="caption">
+            days since
+            <span id="eventDescription">something</span>
+        </div>
+        <script src="daysSinceEvent.js"></script>
 	</body>
 </html>
-
-<script>
-
-	var numberElement = document.getElementById("numberOfDays")
-	var descriptionElement = document.getElementById("eventDescription")
-
-    var numberOfDays = getDaysSinceDate("eventDate");
-
-    if (numberOfDays > 14) {
-        numberElement.className = "alert";
-    } else if (numberOfDays > 7) {
-        numberElement.className = "warning";
-    } else {
-        numberElement.className = "";
-    }
-
-    var description = getQueryVariable("eventDescription");
-    var daysSinceEvent = getDaysSinceDate("eventDate");
-
-    numberElement.innerHTML = daysSinceEvent;
-    descriptionElement.innerHTML = description;
-
-	function getDaysSinceDate(variable) {
-
-		var eventDateUrlParameter = getQueryVariable(variable);
-		var eventDateAsArray = eventDateUrlParameter.split('/');
-		var eventDateAsObject = new Date(eventDateAsArray[2], eventDateAsArray[0]-1, eventDateAsArray[1]);
-		var currentDateAsObject = new Date()
-		var numberOfDaysSinceEventDate = Math.round((currentDateAsObject-eventDateAsObject)/(1000*60*60*24));
-		return numberOfDaysSinceEventDate;
-	}
-
-	function getQueryVariable(variable) {
-		var query = window.location.search.substring(1);
-		var vars = query.split("&");
-		for (var i=0;i<vars.length;i++) {
-			var pair = vars[i].split("=");
-			if (pair[0] == variable) {
-				return unescape(pair[1]);
-			}
-		} 
-	}
-
-</script>
