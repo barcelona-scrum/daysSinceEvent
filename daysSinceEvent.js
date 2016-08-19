@@ -3,12 +3,19 @@
     var descriptionElement = document.getElementById("eventDescription");
     var eventDateString = getQueryVariable("eventDate");
     var eventDescriptionString = getQueryVariable("eventDescription");
+    var daysSinceEvent = getDaysSinceDate(eventDateString);
 
     if (typeof eventDateString !== "undefined") {
-        numberOfDaysElement.innerHTML = getDaysSinceDate(eventDateString);
+        numberOfDaysElement.innerHTML = daysSinceEvent;
     }
-    if (typeof eventDescription !== "undefined") {
+    if (typeof eventDescriptionString !== "undefined") {
         descriptionElement.innerHTML = eventDescriptionString;
+    }
+
+    if (daysSinceEvent > 14) {
+        numberOfDaysElement.classList.add("alert");
+    } else if (daysSinceEvent > 7) {
+        numberOfDaysElement.classList.add("warning");
     }
 
     function getDaysSinceDate(eventDateString) {
