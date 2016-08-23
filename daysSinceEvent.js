@@ -12,10 +12,12 @@
         descriptionElement.innerHTML = eventDescriptionString;
     }
 
-    if (daysSinceEvent > 14) {
-        numberOfDaysElement.classList.add("alert");
-    } else if (daysSinceEvent > 7) {
-        numberOfDaysElement.classList.add("warning");
+    var daysBeforeAlertingInt = parseInt(getQueryVariable("daysBeforeAlerting"));
+    var daysBeforeWarningInt = parseInt(getQueryVariable("daysBeforeWarning"));
+    if (daysSinceEvent > daysBeforeAlertingInt) {
+    	numberOfDaysElement.classList.add("alert");
+    } else if (daysSinceEvent > daysBeforeWarningInt) {
+    	numberOfDaysElement.classList.add("warning");
     }
 
     function getDaysSinceDate(eventDateString) {
