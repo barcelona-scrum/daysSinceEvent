@@ -15,9 +15,9 @@
     var daysBeforeAlertingInt = parseInt(getQueryVariable("daysBeforeAlerting"));
     var daysBeforeWarningInt = parseInt(getQueryVariable("daysBeforeWarning"));
     if (daysSinceEvent > daysBeforeAlertingInt) {
-    	numberOfDaysElement.classList.add("alert");
+    	numberOfDaysElement.parentElement.classList.add("alert");
     } else if (daysSinceEvent > daysBeforeWarningInt) {
-    	numberOfDaysElement.classList.add("warning");
+    	numberOfDaysElement.parentElement.classList.add("warning");
     }
 
     function getDaysSinceDate(eventDateString) {
