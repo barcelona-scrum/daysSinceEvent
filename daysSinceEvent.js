@@ -16,6 +16,7 @@ let state = {
         textColor: "#000",
         bgColor: "#ff0033"
     } ],
+    displayLimits: true,
     startDate: Date.now(),
     description: "something"
 };
@@ -92,6 +93,30 @@ const elements = {
 
         numberElement.parentElement.style.backgroundColor = limit.bgColor;
         numberElement.parentElement.style.color = limit.textColor;
+    },
+    "limits": () => {
+        if (state.displayLimits) {
+            const currentLimit = getCurrentLimit(state);
+            let holder = document.querySelector(".limits");
+            let newHolder = holder.cloneNode(false);
+            let limitElements = state.limits.map((limit) => {
+                let limitElement = document.createElement("span");
+
+                limitElement.textContent = ">= " + limit.daysOver;
+                limitElement.style.backgroundColor = limit.bgColor;
+                limitElement.style.color = limit.textColor;
+
+                if (limit == currentLimit) {
+                    limitElement.classList.add("current");
+                }
+
+                return limitElement;
+            });
+            limitElements.forEach((el) => {
+                newHolder.appendChild(el);
+            });
+            holder.parentNode.replaceChild(newHolder, holder);
+        }
     }
 };
 
