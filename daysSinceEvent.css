@@ -31,16 +31,27 @@ body {
     transform: translate(-50%, -50%);
 }
 
-.warning {
-    background-color: #fffe40;
-}
-
-.alert {
-    background-color: #f00;
-}
-
 .caption {
     font-size: 2em;
     font-style: italic;
 }
 
+.limits {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    margin: 1em;
+}
+
+.limits > span {
+    font-size: 2em;
+    color: #777;
+    padding: 0 0.25em;
+    margin: 0 0.25em;
+    opacity: 0.5;
+}
+
+.limits > span.current {
+    opacity: 1.0;
+}
