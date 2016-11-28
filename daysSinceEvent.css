@@ -31,16 +31,7 @@ body {
     transform: translate(-50%, -50%);
 }
 
-.warning {
-    background-color: #fffe40;
-}
-
-.alert {
-    background-color: #f00;
-}
-
 .caption {
     font-size: 2em;
     font-style: italic;
 }
-
