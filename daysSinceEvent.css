@@ -55,3 +55,11 @@ body {
 .limits > span.current {
     opacity: 1.0;
 }
+
+.reset {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    margin: 1em;
+}

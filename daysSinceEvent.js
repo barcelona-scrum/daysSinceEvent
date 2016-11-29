@@ -5,46 +5,19 @@ let state = {
         bgColor: "#66cc66"
     },
     {
-        name: "daysBeforeWarning",
         daysOver: 10,
         textColor: "#000",
         bgColor: "#3399ff"
     },
     {
-        name: "daysBeforeAlerting",
         daysOver: 20,
         textColor: "#000",
         bgColor: "#ff0033"
     } ],
     displayLimits: true,
-    startDate: Date.now(),
+    startDate: undefined,
     description: "something"
 };
-
-const modifyLimit = (name, limits, newValue) => {
-    let limit = limits.find((limit) => {
-        return limit.name !== undefined && limit.name === name
-    });
-    limit.daysOver = newValue;
-    return [
-       ...limits.slice(undefined, limits.indexOf(limit)),
-       limit,
-       ...limits.slice(limits.indexOf(limit)+1, undefined)
-    ];
-};
-
-const getCurrentLimit = (state) => {
-    return state.limits.reduce((result, limit) => {
-        if (getNumberOfDaysElapsed(state.startDate) >= limit.daysOver) {
-            result = limit;
-        }
-        return result;
-    })
-};
-
-const getNumberOfDaysElapsed = (startDate) => {
-    return Math.floor((new Date() - startDate)/(1000*60*60*24));
-}
 
 const queryKeys = {
     "eventDate": (state, value) => {
@@ -55,78 +28,132 @@ const queryKeys = {
     },
     "daysBeforeWarning": (state, value) => {
         return Object.assign({}, state, {
-            limits: modifyLimit("daysBeforeWarning", state.limits, value)
+            limits: modifyLimit(1, state.limits, parseInt(value, 10))
         });
     },
     "daysBeforeAlerting": (state, value) => {
         return Object.assign({}, state, {
-            limits: modifyLimit("daysBeforeAlerting", state.limits, value)
+            limits: modifyLimit(2, state.limits, parseInt(value, 10))
+        });
+    },
+    "displayLimits": (state, value) => {
+        return Object.assign({}, state, {
+            displayLimits: value == "true"
         });
     }
 };
 
-const queryParameters = (() => {
-    const query = window.location.search.split("#");
-    const queryParams = query[0].substring(1);
-    const queryHash = query[1];
-    return queryParams.split("&").reduce((result, str) => {
-        const keyValue = str.split("=");
-        if (keyValue[1] !== undefined) {
-            result[keyValue[0]] = unescape(keyValue[1]);
+const modifyLimit = (idx, limits, newValue) => {
+    let limit = Object.assign({}, limits[idx]);
+
+    if (Object.keys(limit).length !== 0) {
+        limit.daysOver = newValue;
+        return [
+           ...limits.slice(undefined, idx),
+           limit,
+           ...limits.slice(idx+1, undefined)
+        ];
+    } else {
+        return limits;
+    }
+};
+
+const getCurrentLimit = (limits, startDate) => {
+    const { numberOfDaysElapsedSince } = DateUtils;
+
+    return limits.reduce((result, limit) => {
+        if (numberOfDaysElapsedSince(startDate) >= limit.daysOver) {
+            result = limit;
         }
         return result;
-    }, {});
-})();
+    })
+};
 
-const elements = {
-    "counter": () => {
-        const daysElapsed = getNumberOfDaysElapsed(state.startDate);
-        document.getElementById("numberOfDays").textContent = daysElapsed;
+const render = {
+    "counter": (state) => {
+        const { numberOfDaysElapsedSince } = DateUtils;
+
+        if (state.startDate !== undefined) {
+            const daysElapsed = numberOfDaysElapsedSince(state.startDate);
+            document.getElementById("numberOfDays").textContent = daysElapsed;
+        }
     },
-    "description": () => {
+    "description": (state) => {
         document.getElementById("eventDescription").textContent = state.description;
     },
-    "numberColor": () => {
-        const numberOfDays = getNumberOfDaysElapsed(state.startDate);
-        const limit = getCurrentLimit(state);
+    "numberColor": (state) => {
+        const limit = getCurrentLimit(state.limits, state.startDate);
         let numberElement = document.getElementById("numberOfDays");
 
         numberElement.parentElement.style.backgroundColor = limit.bgColor;
         numberElement.parentElement.style.color = limit.textColor;
     },
-    "limits": () => {
-        if (state.displayLimits) {
-            const currentLimit = getCurrentLimit(state);
-            let holder = document.querySelector(".limits");
-            let newHolder = holder.cloneNode(false);
-            let limitElements = state.limits.map((limit) => {
-                let limitElement = document.createElement("span");
-
-                limitElement.textContent = ">= " + limit.daysOver;
-                limitElement.style.backgroundColor = limit.bgColor;
-                limitElement.style.color = limit.textColor;
-
-                if (limit == currentLimit) {
-                    limitElement.classList.add("current");
-                }
-
-                return limitElement;
-            });
-            limitElements.forEach((el) => {
-                newHolder.appendChild(el);
-            });
-            holder.parentNode.replaceChild(newHolder, holder);
+    "limits": (state) => {
+        if (!state.displayLimits) {
+            return;
         }
+
+        const currentLimit = getCurrentLimit(state.limits, state.startDate);
+
+        let holder = document.querySelector(".limits");
+        let newHolder = holder.cloneNode(false);
+        let limitElements = state.limits.map((limit) => {
+            let limitElement = document.createElement("span");
+
+            limitElement.textContent = ">= " + limit.daysOver;
+            limitElement.style.backgroundColor = limit.bgColor;
+            limitElement.style.color = limit.textColor;
+
+            if (limit == currentLimit) {
+                limitElement.classList.add("current");
+            }
+
+            return limitElement;
+        });
+
+        limitElements.forEach((el) => {
+            newHolder.appendChild(el);
+        });
+        holder.parentNode.replaceChild(newHolder, holder);
+    },
+    "resetButton": (state) => {
+        const { queryParameters, marshalQueryString } = QueryStringUtils;
+        const { getZeroHourToday } = DateUtils;
+
+        let holder = document.querySelector(".reset");
+        let newHolder = holder.cloneNode(false);
+        let button = document.createElement("button");
+
+        button.textContent = "Reset counter";
+        button.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (window.confirm("Reset the counter?")) {
+                const today = getZeroHourToday();
+                const newQueryParams = Object.assign({}, queryParameters, {
+                    eventDate: [
+                        today.getFullYear(),
+                        today.getMonth()+1,
+                        today.getDate()
+                    ].join("-")
+                });
+                window.location.search = marshalQueryString(newQueryParams);
+            }
+        });
+
+        newHolder.appendChild(button);
+        holder.parentNode.replaceChild(newHolder, holder);
     }
 };
 
 (() => {
+    const { queryParameters } = QueryStringUtils;
+
     Object.keys(queryParameters).filter((key) => {
         return key in queryKeys;
     }).forEach((key) => {
         state = queryKeys[key](state, queryParameters[key]);
     });
 
-    Object.keys(elements).forEach((key) => elements[key]());
+    Object.keys(render).forEach((key) => render[key](state));
 })();
 
